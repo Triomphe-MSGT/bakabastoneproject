@@ -1,0 +1,251 @@
+.hero {
+  height: 100vh;
+  min-height: 600px;
+  background-image: url('/images/hero-stone-house.png');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center horizontally */
+  color: var(--color-surface);
+  text-align: center; /* Center text */
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-title {
+  font-size: clamp(3rem, 5vw, 5rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-surface);
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-lg);
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-actions {
+  display: flex;
+  margin-bottom: 100px;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+  justify-content: center; 
+}
+
+.hero-btn-outline {
+  color: #000000;
+  border-radius: 10px;
+  border: 5px solid #ffffff;
+  background-color: #ffffff;
+  font-weight: 600;
+}
+
+.hero-btn-outline:hover {
+   color: #ffffff;
+  background-color: #000000;
+  border-color: #000000;
+  transform: translateY(-2px);
+}
+
+/* Services Section */
+.section-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.section-line {
+  width: 60px;
+  height: 3px;
+  background-color: var(--color-accent);
+  margin: 0 auto;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.service-card {
+  background: var(--color-surface);
+  padding: var(--spacing-lg) var(--spacing-md);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+}
+
+.service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+
+.service-icon {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  color: rgba(0,0,0,0.05);
+  font-weight: 700;
+  margin-bottom: var(--spacing-sm);
+  line-height: 1;
+}
+
+.service-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.service-card p {
+  color: var(--color-text-light);
+}
+
+/* Featured Section */
+.bg-light {
+  background-color: #f4f4f4;
+}
+
+.split-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  align-items: center;
+}
+
+.section-desc {
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-light);
+  font-size: 1.1rem;
+}
+
+.feature-list {
+  margin-bottom: var(--spacing-md);
+}
+
+.feature-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
+  font-weight: 500;
+}
+
+.mt-md {
+  margin-top: var(--spacing-md);
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 500px;
+  background-color: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .split-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .image-placeholder {
+    height: 300px;
+  }
+
+  .split-layout.reverse {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+}
+
+/* Stone Images Grid */
+.split-image-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.stone-img {
+  width: 100%;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  object-fit: cover;
+}
+
+.main-img {
+  height: 300px;
+}
+
+.small-images {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.small-images .stone-img {
+  height: 200px;
+}
+
+/* Technician Section */
+.technician-section {
+  background-color: var(--color-surface);
+}
+
+.technician-img {
+  width: 100%;
+  max-height: 600px;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.technician-name {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+  margin-top: -1rem; /* Pull closer to title */
+}
+
+/* Reverse Layout for Technician Section */
+.split-layout.reverse .split-image {
+  order: 2;
+}
+
+.split-layout.reverse .split-content {
+  order: 1;
+}
+
+@media (min-width: 769px) {
+  .split-layout.reverse {
+    grid-template-columns: 0.8fr 1.2fr; /* Give more space to text if needed, or adjust */
+  }
+}
