@@ -9,9 +9,11 @@ import teamService from '../services/teamService';
 import { useEffect, useState } from 'react';
 
 const heroImages = [
-  '/images/hero-stone-house.png',
-  '/images/stone-house.png',
-  '/images/stone-1.png'
+  "https://res.cloudinary.com/dxtyreyse/image/upload/v1769627368/bakaba-static/stone-1.png",
+  "https://res.cloudinary.com/dxtyreyse/image/upload/v1769627390/bakaba-static/stone-texture.png",
+  "https://res.cloudinary.com/dxtyreyse/image/upload/v1769627372/bakaba-static/stone-house.png",
+  "https://res.cloudinary.com/dxtyreyse/image/upload/v1769628842/bakaba-static/mmyrp1hwshoytx6mlxsf.jpg",
+  "https://res.cloudinary.com/dxtyreyse/image/upload/v1769628892/bakaba-static/locyubpenfdfneggpahr.png"
 ];
 
 const Home = () => {
@@ -77,16 +79,10 @@ const Home = () => {
   const fetchExpertises = async () => {
     try {
       const data = await expertiseService.getActiveExpertise();
-      setExpertises(data);
+      setExpertises(data || []);
     } catch (error) {
       console.error('Erreur lors du chargement des expertises:', error);
-      // Fallback data
-      setExpertises([
-        { _id: 1, title: 'Vente de Produits Décoratifs', description: 'Une large sélection de pierres et matériaux pour sublimer votre intérieur et extérieur.', icon: '01' },
-        { _id: 2, title: 'Pose des Pierres', description: 'Une équipe d\'artisans qualifiés pour une installation durable et esthétique.', icon: '02' },
-        { _id: 3, title: 'Idée de Décoration', description: 'Conseils et accompagnement pour réaliser vos projets de décoration.', icon: '03' },
-        { _id: 4, title: 'Traitement et Rénovation', description: 'Entretien et remise à neuf de vos surfaces en pierre.', icon: '04' }
-      ]);
+      setExpertises([]);
     } finally {
       setLoading(false);
     }
@@ -105,23 +101,10 @@ const Home = () => {
   const fetchTeam = async () => {
     try {
       const data = await teamService.getAllTeamMembers();
-      if (data && data.length > 0) {
-        setTeamPreview(data.slice(0, 4));
-      } else {
-        // Fallback team
-        setTeamPreview([
-          { _id: 't1', name: 'M. Bakaba', role: 'Fondateur & Maître Artisan', imageUrl: '/images/technician-bakaba.png' },
-          { _id: 't2', name: 'Sarah L.', role: 'Designer d\'Intérieur', imageUrl: '' },
-          { _id: 't3', name: 'Jean D.', role: 'Chef de Chantier', imageUrl: '' }
-        ]);
-      }
+      setTeamPreview(data.slice(0, 4) || []);
     } catch (error) {
       console.error('Error fetching team:', error);
-      // Fallback on error too
-      setTeamPreview([
-        { _id: 't1', name: 'M. Bakaba', role: 'Fondateur & Maître Artisan', imageUrl: '/images/technician-bakaba.png' },
-        { _id: 't2', name: 'Sarah L.', role: 'Designer d\'Intérieur', imageUrl: '' }
-      ]);
+      setTeamPreview([]);
     }
   };
 
@@ -131,23 +114,10 @@ const Home = () => {
       const data = await testimonialService.getAllTestimonials();
       // Filter for approved testimonials only
       const approvedTestimonials = data.filter(t => t.isApproved === true);
-      
-      if (approvedTestimonials && approvedTestimonials.length > 0) {
-        setTestimonials(approvedTestimonials);
-      } else {
-        // Fallback testimonials
-        setTestimonials([
-          { _id: 'f1', name: 'Sophie Martin', job: 'Propriétaire', message: 'Un travail d\'une qualité exceptionnelle. Ma terrasse est transformée !', rating: 5, isApproved: true },
-          { _id: 'f2', name: 'Pierre Durand', job: 'Architecte', message: 'Professionnalisme et respect des délais. Je recommande Bakaba Stone.', rating: 5, isApproved: true },
-          { _id: 'f3', name: 'Julie Dubois', job: 'Décoratrice', message: 'Les pierres sont magnifiques et la pose est parfaite.', rating: 4, isApproved: true }
-        ]);
-      }
+      setTestimonials(approvedTestimonials || []);
     } catch (error) {
       console.error('Erreur lors du chargement des témoignages:', error);
-      setTestimonials([
-        { _id: 'f1', name: 'Sophie Martin', job: 'Propriétaire', message: 'Un travail d\'une qualité exceptionnelle. Ma terrasse est transformée !', rating: 5, isApproved: true },
-        { _id: 'f2', name: 'Pierre Durand', job: 'Architecte', message: 'Professionnalisme et respect des délais. Je recommande Bakaba Stone.', rating: 5, isApproved: true }
-      ]);
+      setTestimonials([]);
     }
   };
 
@@ -562,7 +532,7 @@ const Home = () => {
             >
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img 
-                  src="/images/technician-bakaba.png" 
+                  src="https://res.cloudinary.com/dxtyreyse/image/upload/v1769627409/bakaba-static/technician-bakaba.png"
                   alt="M. Bakaba, Maître Artisan" 
                   className="w-full h-[600px] object-cover"
                 />

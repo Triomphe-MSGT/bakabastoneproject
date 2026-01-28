@@ -10,43 +10,14 @@ const FloatingTestimonials = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [loading, setLoading] = useState(true);
 
-  // Fallback data in case API is empty or fails (to ensure "Always displays" request is met for demo)
-  const fallbackTestimonials = [
-    {
-      _id: '1',
-      name: 'Jean Michel',
-      job: 'Architecte',
-      message: 'Une qualité de pierre exceptionnelle et un service irréprochable. Je recommande vivement pour tout projet de construction.',
-      rating: 5
-    },
-    {
-      _id: '2',
-      name: 'Sophie Dubois',
-      job: 'Propriétaire',
-      message: 'Ma terrasse est magnifique grâce à vos conseils. Le rendu est au-delà de mes espérances.',
-      rating: 5
-    },
-    {
-      _id: '3',
-      name: 'Marc Lefebvre',
-      job: 'Entreprise BTP',
-      message: 'Partenaire fiable depuis 3 ans. Délais respectés et matériaux conformes. Un vrai plaisir de travailler ensemble.',
-      rating: 4
-    }
-  ];
-
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
         const data = await testimonialService.getFeaturedTestimonials();
-        if (data && data.length > 0) {
-          setTestimonials(data);
-        } else {
-          setTestimonials(fallbackTestimonials);
-        }
+        setTestimonials(data || []);
       } catch (error) {
         console.error('Error fetching testimonials:', error);
-        setTestimonials(fallbackTestimonials);
+        setTestimonials([]);
       } finally {
         setLoading(false);
       }

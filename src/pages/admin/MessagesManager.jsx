@@ -1,4 +1,3 @@
-
 import {
   Mail,
   Trash2,
@@ -10,11 +9,10 @@ import {
   User,
   AlertCircle,
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 import messageService from "../../services/messageService";
-
 
 const MessagesManager = () => {
   const [messages, setMessages] = useState([]);
@@ -24,7 +22,7 @@ const MessagesManager = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { user } = useAuth();
-  
+
   // Fonction pour récupérer les messages
   const fetchMessages = async () => {
     try {
@@ -67,27 +65,29 @@ const MessagesManager = () => {
 
   const markAsRead = async (id) => {
     try {
-        // Optimistic update
-        setMessages(prev => prev.map((m) => (m._id === id ? { ...m, read: true } : m)));
-        await messageService.markAsRead(id);
+      // Optimistic update
+      setMessages((prev) =>
+        prev.map((m) => (m._id === id ? { ...m, read: true } : m))
+      );
+      await messageService.markAsRead(id);
     } catch (error) {
-        console.error("Error marking as read", error);
-        // Revert if error
-        fetchMessages();
+      console.error("Error marking as read", error);
+      // Revert if error
+      fetchMessages();
     }
   };
 
   const deleteMessage = async (id) => {
     if (window.confirm("Êtes-vous sûr de vouloir supprimer ce message ?")) {
       try {
-          await messageService.deleteMessage(id);
-          setMessages(prev => prev.filter((m) => m._id !== id));
-          if (selectedMessage?._id === id) {
-              setSelectedMessage(null);
-          }
+        await messageService.deleteMessage(id);
+        setMessages((prev) => prev.filter((m) => m._id !== id));
+        if (selectedMessage?._id === id) {
+          setSelectedMessage(null);
+        }
       } catch (error) {
-          console.error("Error deleting message", error);
-          alert("Erreur lors de la suppression");
+        console.error("Error deleting message", error);
+        alert("Erreur lors de la suppression");
       }
     }
   };
@@ -95,9 +95,9 @@ const MessagesManager = () => {
   const handleViewMessage = (message) => {
     setSelectedMessage(message);
     if (!message.read) {
-        markAsRead(message._id);
+      markAsRead(message._id);
     }
-  }
+  };
 
   const filteredMessages = messages.filter((m) => {
     const matchesSearch =
@@ -113,7 +113,12 @@ const MessagesManager = () => {
 
   const unreadCount = messages.filter((m) => !m.read).length;
 
-  if (loading && messages.length === 0) return <div style={{padding: "2rem", textAlign: "center"}}>Chargement des messages...</div>;
+  if (loading && messages.length === 0)
+    return (
+      <div style={{ padding: "2rem", textAlign: "center" }}>
+        Chargement des messages...
+      </div>
+    );
 
   return (
     <div>
@@ -130,7 +135,8 @@ const MessagesManager = () => {
       </div>
 
       {error && (
-        <div style={{
+        <div
+          style={{
             padding: "1rem",
             backgroundColor: "#fee2e2",
             color: "#991b1b",
@@ -138,10 +144,11 @@ const MessagesManager = () => {
             marginBottom: "1rem",
             display: "flex",
             alignItems: "center",
-            gap: "0.5rem"
-        }}>
-            <AlertCircle size={20} />
-            {error}
+            gap: "0.5rem",
+          }}
+        >
+          <AlertCircle size={20} />
+          {error}
         </div>
       )}
 
@@ -192,7 +199,7 @@ const MessagesManager = () => {
       <div className="message-list">
         <AnimatePresence>
           {filteredMessages.map((message) => (
-            <motion.div
+            <div
               key={message._id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -238,7 +245,7 @@ const MessagesManager = () => {
                   Supprimer
                 </button>
               </div>
-            </motion.div>
+            </div>
           ))}
         </AnimatePresence>
       </div>
@@ -264,7 +271,7 @@ const MessagesManager = () => {
             className="modal-backdrop"
             onClick={() => setSelectedMessage(null)}
           >
-            <motion.div
+            <div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -330,7 +337,9 @@ const MessagesManager = () => {
                     }}
                   >
                     <Clock size={14} style={{ marginRight: "0.5rem" }} />
-                    {new Date(selectedMessage.createdAt || selectedMessage.date).toLocaleString("fr-FR")}
+                    {new Date(
+                      selectedMessage.createdAt || selectedMessage.date
+                    ).toLocaleString("fr-FR")}
                   </div>
                 </div>
 
@@ -370,7 +379,7 @@ const MessagesManager = () => {
                   Répondre
                 </a>
               </div>
-            </motion.div>
+            </div>
           </div>
         )}
       </AnimatePresence>
@@ -378,4 +387,4 @@ const MessagesManager = () => {
   );
 };
 
-export default MessagesManager
+export default MessagesManager;

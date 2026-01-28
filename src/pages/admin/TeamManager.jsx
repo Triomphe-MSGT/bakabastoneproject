@@ -47,7 +47,7 @@ const TeamManager = () => {
     setUploading(true);
     try {
       const data = await uploadService.uploadFile(formDataUpload);
-      return BASE_URL + data.imageUrl;
+      return data.imageUrl;
     } catch (error) {
       console.error('Erreur upload:', error);
       alert('Erreur lors du téléversement');

@@ -42,7 +42,7 @@ const About = () => {
     des solutions complètes : vente de produits décoratifs, pose, décoration et rénovation.
   `;
 
-  const aboutImageFallback = "https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=1000";
+  const aboutImageFallback = "https://res.cloudinary.com/dxtyreyse/image/upload/v1769628842/bakaba-static/mmyrp1hwshoytx6mlxsf.jpg";
 
   const getImageSrc = (imageUrl) => {
     if (!imageUrl) return '';
@@ -92,7 +92,7 @@ const About = () => {
             className="space-y-8"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-full text-sm font-semibold tracking-wide uppercase">
-              <Award size={16} /> L'Excellence Bakaba
+              <Award size={16} /> L'Excellence Bakaba Stone
             </div>
             
             <h2 className="text-3xl md:text-5xl font-heading font-bold text-gray-1000 dark:text leading-tight">
@@ -105,15 +105,15 @@ const About = () => {
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-8 border-t border-gray-100 dark:border-slate-800">
               <div className="text-center sm:text-left">
-                <div className="text-3xl font-bold text-amber-600 mb-1">35+</div>
+                <div className="text-3xl font-bold text-amber-600 mb-1">5+</div>
                 <div className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Années</div>
               </div>
               <div className="text-center sm:text-left">
-                <div className="text-3xl font-bold text-amber-600 mb-1">500+</div>
+                <div className="text-3xl font-bold text-amber-600 mb-1">80+</div>
                 <div className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Réalisations</div>
               </div>
               <div className="text-center sm:text-left">
-                <div className="text-3xl font-bold text-amber-600 mb-1">15</div>
+                <div className="text-3xl font-bold text-amber-600 mb-1">10</div>
                 <div className="text-xs uppercase tracking-widest text-gray-400 font-semibold">Experts</div>
               </div>
             </div>

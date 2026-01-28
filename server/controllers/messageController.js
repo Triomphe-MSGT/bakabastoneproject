@@ -21,7 +21,7 @@ export const createMessage = async (req, res) => {
     // Envoyer notification par mail
     try {
       const settings = await Settings.findOne();
-      const recipientEmail = settings?.contactEmail || process.env.SMTP_USER;
+      const recipientEmail = settings?.contactEmail || process.env.EMAIL_USER;
       
       if (recipientEmail && settings?.notifications?.email) {
         await sendNotificationEmail(recipientEmail, { name, email, subject, message });

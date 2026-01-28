@@ -3,12 +3,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT, // 465 for SSL, 587 for TLS
-  secure: process.env.SMTP_PORT == 465, 
+  host: process.env.EMAIL_HOST,
+  port: parseInt(process.env.EMAIL_PORT),
+  secure: process.env.EMAIL_SECURE === 'true', 
   auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -16,7 +16,7 @@ export const sendNotificationEmail = async (to, messageData) => {
   const { name, email, subject, message } = messageData;
 
   const mailOptions = {
-    from: `"Liteos Site Vitrine" <${process.env.SMTP_USER}>`,
+    from: `"Bakaba Stone" <${process.env.EMAIL_USER}>`,
     to,
     subject: `Nouveau message: ${subject}`,
     html: `

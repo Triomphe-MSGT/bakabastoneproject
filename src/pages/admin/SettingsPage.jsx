@@ -126,9 +126,8 @@ const SettingsPage = () => {
     setUploading(true);
     try {
       const data = await uploadService.uploadFile(formData);
-      // Assuming backend returns relative path, prepend base URL if needed or handle in service
-      // Service returns data object directly.
-      return 'http://localhost:5000' + data.imageUrl;
+      // Backend now returns full Cloudinary URL in data.imageUrl
+      return data.imageUrl;
     } catch (error) {
       console.error('Erreur upload:', error);
       alert('Erreur lors du téléversement');

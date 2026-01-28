@@ -51,10 +51,8 @@ const CollectionsManager = () => {
     setUploading(true);
     try {
       const data = await uploadService.uploadFile(formDataUpload);
-      // Ensure we handle the path correctly. Ideally backend returns relative path or full URL.
-      // Assuming backend returns { imageUrl: '/uploads/...' }
-      // If service returns strict data structure, check it.
-      return BASE_URL + data.imageUrl;
+      // Backend now returns full Cloudinary URL in data.imageUrl
+      return data.imageUrl;
     } catch (error) {
       console.error('Erreur upload:', error);
       alert('Erreur lors du téléversement');

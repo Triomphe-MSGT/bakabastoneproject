@@ -1,7 +1,7 @@
 import api from './api';
 
 const getFeaturedTestimonials = async () => {
-  constresponse = await api.get('/testimonials/featured');
+  const response = await api.get('/testimonials/featured');
   return response.data;
 };
 
