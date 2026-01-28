@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, X, Save, Loader2, Eye, EyeOff, Award } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import expertiseService from '../../services/expertiseService';
 
 const ExpertiseManager = () => {
   const [expertises, setExpertises] = useState([]);
@@ -17,16 +18,13 @@ const ExpertiseManager = () => {
     isActive: true
   });
 
-  const API_URL = 'http://localhost:5000/api/expertise';
-
   useEffect(() => {
     fetchExpertises();
   }, []);
 
   const fetchExpertises = async () => {
     try {
-      const response = await fetch(API_URL);
-      const data = await response.json();
+      const data = await expertiseService.getAllExpertise();
       setExpertises(data);
     } catch (error) {
       console.error('Erreur lors du chargement des expertises:', error);
@@ -38,21 +36,13 @@ const ExpertiseManager = () => {
     setLoading(true);
     
     try {
-      const method = isEditing ? 'PUT' : 'POST';
-      const url = isEditing ? `${API_URL}/${currentExpertise._id}` : API_URL;
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        fetchExpertises();
-        resetForm();
+      if (isEditing) {
+        await expertiseService.updateExpertise(currentExpertise._id, formData);
+      } else {
+        await expertiseService.createExpertise(formData);
       }
+      fetchExpertises();
+      resetForm();
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
     } finally {
@@ -63,9 +53,7 @@ const ExpertiseManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette expertise ?')) {
       try {
-        await fetch(`${API_URL}/${id}`, {
-          method: 'DELETE',
-        });
+        await expertiseService.deleteExpertise(id);
         fetchExpertises();
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
@@ -88,13 +76,7 @@ const ExpertiseManager = () => {
 
   const toggleActive = async (expertise) => {
     try {
-      await fetch(`${API_URL}/${expertise._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ...expertise, isActive: !expertise.isActive }),
-      });
+      await expertiseService.updateExpertise(expertise._id, { ...expertise, isActive: !expertise.isActive });
       fetchExpertises();
     } catch (error) {
       console.error('Erreur:', error);

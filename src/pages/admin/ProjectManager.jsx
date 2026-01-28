@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, X, Image as ImageIcon, Save, Loader2, Upload, Link } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import projectService from '../../services/projectService';
+import uploadService from '../../services/uploadService';
 
 const ProjectManager = () => {
   const [projects, setProjects] = useState([]);
@@ -20,12 +22,10 @@ const ProjectManager = () => {
     description: '',
     imageUrl: '',
     category: 'Général',
-    materials: ''
+    materials: '',
+    totalPrice: 0,
+    dimensions: ''
   });
-
-  const API_URL = 'http://localhost:5000/api/projects';
-  const UPLOAD_URL = 'http://localhost:5000/api/upload';
-  const BASE_URL = 'http://localhost:5000';
 
   useEffect(() => {
     fetchProjects();
@@ -33,13 +33,14 @@ const ProjectManager = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch(API_URL);
-      const data = await response.json();
+      const data = await projectService.getAllProjects();
       setProjects(data);
     } catch (error) {
       console.error('Erreur lors du chargement des projets:', error);
     }
   };
+
+  const BASE_URL = 'http://localhost:5000';
 
   const uploadImage = async (file) => {
     const formDataUpload = new FormData();
@@ -47,21 +48,11 @@ const ProjectManager = () => {
 
     setUploading(true);
     try {
-      const response = await fetch(UPLOAD_URL, {
-        method: 'POST',
-        body: formDataUpload,
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-
-      const data = await response.json();
+      const data = await uploadService.uploadFile(formDataUpload);
       return BASE_URL + data.imageUrl;
     } catch (error) {
       console.error('Erreur upload:', error);
-      alert('Erreur lors du téléversement: ' + error.message);
+      alert('Erreur lors du téléversement');
       return null;
     } finally {
       setUploading(false);
@@ -91,21 +82,14 @@ const ProjectManager = () => {
         materials: formData.materials.split('\n').filter(m => m.trim() !== '')
       };
 
-      const method = isEditing ? 'PUT' : 'POST';
-      const url = isEditing ? `${API_URL}/${currentProject._id}` : API_URL;
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(projectData),
-      });
-
-      if (response.ok) {
-        fetchProjects();
-        resetForm();
+      if (isEditing) {
+        await projectService.updateProject(currentProject._id, projectData);
+      } else {
+        await projectService.createProject(projectData);
       }
+
+      fetchProjects();
+      resetForm();
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
     } finally {
@@ -116,9 +100,7 @@ const ProjectManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) {
       try {
-        await fetch(`${API_URL}/${id}`, {
-          method: 'DELETE',
-        });
+        await projectService.deleteProject(id);
         fetchProjects();
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
@@ -132,7 +114,9 @@ const ProjectManager = () => {
       description: project.description,
       imageUrl: project.imageUrl,
       category: project.category,
-      materials: (project.materials || []).join('\n')
+      materials: (project.materials || []).join('\n'),
+      totalPrice: project.totalPrice || 0,
+      dimensions: project.dimensions || ''
     });
     setPreviewUrl(project.imageUrl);
     setUploadMode('url');
@@ -237,24 +221,48 @@ const ProjectManager = () => {
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                     className="form-input"
-                    placeholder="Ex: Villa Moderne"
+                    placeholder="Ex: Villa Bakaba Moderne"
                     required
                   />
                 </div>
                 
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">Catégorie</label>
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="form-input form-select"
+                    >
+                      <option value="Général">Général</option>
+                      <option value="Résidentiel">Résidentiel</option>
+                      <option value="Commercial">Commercial</option>
+                      <option value="Urbain">Urbain</option>
+                      <option value="Paysager">Paysager</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Dimensions / Surface</label>
+                    <input
+                      type="text"
+                      value={formData.dimensions}
+                      onChange={(e) => setFormData({ ...formData, dimensions: e.target.value })}
+                      className="form-input"
+                      placeholder="Ex: 450 m², 20m x 15m..."
+                    />
+                  </div>
+                </div>
+
                 <div className="form-group">
-                  <label className="form-label">Catégorie</label>
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="form-input form-select"
-                  >
-                    <option value="Général">Général</option>
-                    <option value="Résidentiel">Résidentiel</option>
-                    <option value="Commercial">Commercial</option>
-                    <option value="Urbain">Urbain</option>
-                    <option value="Paysager">Paysager</option>
-                  </select>
+                  <label className="form-label">Prix de la réalisation (€)</label>
+                  <input
+                    type="number"
+                    value={formData.totalPrice}
+                    onChange={(e) => setFormData({ ...formData, totalPrice: parseFloat(e.target.value) || 0 })}
+                    className="form-input"
+                    min="0"
+                    placeholder="Montant total approximatif"
+                  />
                 </div>
 
                 {/* Image Upload Section */}

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Check, Star, Award, Shield } from 'lucide-react';
+import { ArrowLeft, Check, Star, Award, Shield, Heart, Tag, XCircle, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './CollectionDetail.css';
+import collectionService from '../services/collectionService';
 
 const CollectionDetail = () => {
   const { id } = useParams();
@@ -16,10 +17,21 @@ const CollectionDetail = () => {
     fetchCollection();
   }, [id]);
 
+  const handleLike = async () => {
+    try {
+      const response = await fetch(`${API_URL}/${id}/like`, { method: 'PATCH' });
+      if (response.ok) {
+        const data = await response.json();
+        setCollection(prev => ({ ...prev, likes: data.likes }));
+      }
+    } catch (error) {
+       console.error('Error liking:', error);
+    }
+  };
+
   const fetchCollection = async () => {
     try {
-      const response = await fetch(`${API_URL}/${id}`);
-      const data = await response.json();
+      const data = await collectionService.getCollectionById(id);
       setCollection(data);
     } catch (error) {
       console.error('Erreur:', error);
@@ -104,9 +116,45 @@ const CollectionDetail = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <span className="collection-badge">Collection Premium</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <span className="collection-badge">Collection Premium</span>
+              <button 
+                onClick={handleLike}
+                style={{ 
+                  background: 'rgba(255,255,255,0.2)', 
+                  border: 'none', 
+                  color: 'white', 
+                  padding: '0.4rem 0.8rem', 
+                  borderRadius: '50px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '0.4rem', 
+                  cursor: 'pointer',
+                  backdropFilter: 'blur(5px)'
+                }}
+              >
+                <Heart size={18} fill={collection.likes > 0 ? "white" : "none"} />
+                <span>{collection.likes || 0}</span>
+              </button>
+            </div>
             <h1 className="collection-title">{collection.name}</h1>
             <p className="collection-short-desc">{collection.description}</p>
+            
+            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1.5rem', color: 'white', fontWeight: '500' }}>
+               {collection.pricePerM2 > 0 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Tag size={20} color="var(--color-accent)" /> 
+                    <span>{collection.pricePerM2.toLocaleString()} FCFA <small style={{ opacity: 0.8 }}>/ m²</small></span>
+                  </div>
+               )}
+               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {collection.isAvailable ? (
+                    <><CheckCircle size={20} color="#4ade80" /> <span>En stock immédiat</span></>
+                  ) : (
+                    <><XCircle size={20} color="#fbbf24" /> <span>Disponible sur commande</span></>
+                  )}
+               </div>
+            </div>
           </motion.div>
         </div>
       </div>

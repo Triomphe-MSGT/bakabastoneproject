@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { FolderKanban, MessageSquare, Users, TrendingUp } from 'lucide-react';
-import './AdminDashboard.css';
+import React, { useEffect, useState } from "react";
+import { FolderKanban, MessageSquare, Gem, Award } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import "./AdminDashboard.css";
+import projectService from "../../services/projectService";
+import messageService from "../../services/messageService";
+import collectionService from "../../services/collectionService";
+import expertiseService from "../../services/expertiseService";
 
-const StatCard = ({ title, value, icon: Icon, trend }) => (
+const StatCard = ({ title, value, icon: LucideIcon, trend }) => (
   <div className="stat-card">
     <div className="stat-card-header">
       <div className="stat-icon">
-        <Icon size={24} />
+        <LucideIcon size={24} />
       </div>
-      {trend && (
-        <span className="stat-trend">
-          {trend}
-        </span>
-      )}
+      {trend && <span className="stat-trend">{trend}</span>}
     </div>
     <div>
       <h3 className="stat-value">{value}</h3>
@@ -22,48 +23,105 @@ const StatCard = ({ title, value, icon: Icon, trend }) => (
 );
 
 const AdminDashboard = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     projects: 0,
     messages: 0,
-    views: 1250,
+    unreadMessages: 0,
+    collections: 0,
+    expertise: 0,
   });
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch real stats here
-    setStats(prev => ({ ...prev, projects: 5, messages: 12 }));
-  }, []);
+    const fetchData = async () => {
+      try {
+        const [projectsData, messagesData, collectionsData, expertiseData] = await Promise.all([
+          projectService.getAllProjects(),
+          messageService.getMessages(),
+          collectionService.getAllCollections(),
+          expertiseService.getAllExpertise(),
+        ]);
+
+        // Calculate stats
+        const projectCount = Array.isArray(projectsData) ? projectsData.length : 0;
+        const messageCount = Array.isArray(messagesData) ? messagesData.length : 0;
+        const unreadCount = Array.isArray(messagesData) ? messagesData.filter(m => !m.read).length : 0;
+        const collectionCount = Array.isArray(collectionsData) ? collectionsData.length : 0;
+        const expertiseCount = Array.isArray(expertiseData) ? expertiseData.length : 0;
+
+        setStats({
+          projects: projectCount,
+          messages: messageCount,
+          unreadMessages: unreadCount,
+          collections: collectionCount,
+          expertise: expertiseCount,
+        });
+
+        // Get recent messages for activity
+        if (Array.isArray(messagesData)) {
+          const sortedMessages = messagesData.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          ).slice(0, 5);
+          setRecentActivity(sortedMessages);
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.token) {
+      fetchData();
+    }
+  }, [user]);
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now - date;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    
+    if (hours < 24) return `Il y a ${hours} heures`;
+    return date.toLocaleDateString("fr-FR");
+  };
 
   return (
     <div className="admin-dashboard">
       <div className="dashboard-header">
         <h2 className="dashboard-title">Vue d'ensemble</h2>
-        <p className="dashboard-subtitle">Voici ce qui se passe sur votre site aujourd'hui.</p>
+        <p className="dashboard-subtitle">
+          Voici ce qui se passe sur votre site aujourd'hui.
+        </p>
       </div>
-      
+
       <div className="stats-grid">
-        <StatCard 
-          title="Projets en ligne" 
-          value={stats.projects} 
-          icon={FolderKanban} 
-          trend="+2 cette semaine"
+        <StatCard
+          title="Projets en ligne"
+          value={loading ? "-" : stats.projects}
+          icon={FolderKanban}
+          trend="Total"
         />
-        <StatCard 
-          title="Messages reçus" 
-          value={stats.messages} 
-          icon={MessageSquare} 
-          trend="+5 nouveaux"
+        <StatCard
+          title="Messages reçus"
+          value={loading ? "-" : stats.messages}
+          icon={MessageSquare}
+          trend={stats.unreadMessages > 0 ? `${stats.unreadMessages} non lu(s)` : "Tous lus"}
         />
-        <StatCard 
-          title="Visiteurs uniques" 
-          value={stats.views} 
-          icon={Users} 
-          trend="+12% vs mois dernier"
+        <StatCard
+          title="Collections actives"
+          value={loading ? "-" : stats.collections}
+          icon={Gem}
+          trend="Total"
         />
-        <StatCard 
-          title="Taux de conversion" 
-          value="3.2%" 
-          icon={TrendingUp} 
-          trend="+0.4%"
+        <StatCard
+          title="Services / Expertises"
+          value={loading ? "-" : stats.expertise}
+          icon={Award}
+          trend="Total"
         />
       </div>
 
@@ -71,22 +129,32 @@ const AdminDashboard = () => {
         <div className="content-main dashboard-card">
           <h3 className="card-title">Statistiques des visites</h3>
           <div className="chart-placeholder">
-            Graphique des visites (à implémenter)
+            <div style={{ padding: "2rem", textAlign: "center", color: "var(--color-text-light)" }}>
+              Graphique des visites (Simulation)
+            </div>
           </div>
         </div>
 
         <div className="dashboard-card">
-          <h3 className="card-title">Activité récente</h3>
+          <h3 className="card-title">Activité récente (Messages)</h3>
           <div className="activity-list">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="activity-item">
-                <div className="activity-dot" />
-                <div className="activity-content">
-                  <p className="activity-title">Nouveau message de contact</p>
-                  <p className="activity-time">Il y a {i} heures</p>
+            {loading ? (
+              <div style={{ padding: "1rem" }}>Chargement...</div>
+            ) : recentActivity.length > 0 ? (
+              recentActivity.map((msg) => (
+                <div key={msg._id} className="activity-item">
+                  <div className="activity-dot" />
+                  <div className="activity-content">
+                    <p className="activity-title">Message de {msg.name}</p>
+                    <p className="activity-time">{formatDate(msg.createdAt)}</p>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div style={{ padding: "1rem", color: "var(--color-text-light)" }}>
+                Aucune activité récente.
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

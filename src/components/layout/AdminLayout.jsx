@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FolderKanban, MessageSquare, Settings, LogOut, Gem, Award } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, MessageSquare, Settings, LogOut, Gem, Award, Users, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/admin.css';
@@ -14,6 +14,8 @@ const AdminLayout = () => {
     { path: '/admin/collections', icon: Gem, label: 'Collections' },
     { path: '/admin/expertise', icon: Award, label: 'Expertise' },
     { path: '/admin/projects', icon: FolderKanban, label: 'Projets' },
+    { path: '/admin/team', icon: Users, label: 'Notre Équipe' },
+    { path: '/admin/testimonials', icon: MessageCircle, label: 'Témoignages' },
     { path: '/admin/messages', icon: MessageSquare, label: 'Messages' },
     { path: '/admin/settings', icon: Settings, label: 'Paramètres' },
   ];

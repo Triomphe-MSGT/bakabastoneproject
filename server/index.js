@@ -10,6 +10,9 @@ import authRoutes from './routes/authRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import collectionRoutes from './routes/collectionRoutes.js';
 import expertiseRoutes from './routes/expertiseRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
+import teamRoutes from './routes/teamRoutes.js';
+import testimonialRoutes from './routes/testimonialRoutes.js';
 import User from './models/User.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -28,11 +31,17 @@ app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+import settingsRoutes from './routes/settingsRoutes.js';
+
 app.use('/api/projects', projectRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/collections', collectionRoutes);
 app.use('/api/expertise', expertiseRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/team', teamRoutes);
+app.use('/api/testimonials', testimonialRoutes);
 
 // MongoDB Connection & Seeding
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sitevitrine')

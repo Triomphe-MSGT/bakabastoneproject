@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 import Section from '../components/ui/Section';
 import Button from '../components/ui/Button';
+import TestimonialForm from '../components/TestimonialForm';
 import './Contact.css';
+import messageService from '../services/messageService';
+import settingsService from '../services/settingsService';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -11,16 +14,52 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [status, setStatus] = useState({ type: '', message: '' });
+  const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState({
+    contactEmail: 'contact@sitevitrine.fr',
+    phone: '+33 1 23 45 67 89',
+    address: '123 Rue de la Pierre, 75001 Paris',
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await settingsService.getSettings();
+        setSettings(prev => ({ ...prev, ...data }));
+      } catch (error) {
+        console.error('Error fetching settings for contact:', error);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const handleSubmit = (e) => {
+// ... existing handleSubmit ...
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log('Form submitted:', formData);
-    alert('Merci pour votre message. Nous vous contacterons bientôt.');
+    setLoading(true);
+    setStatus({ type: '', message: '' });
+
+    try {
+      await messageService.createMessage(formData);
+
+      setStatus({
+        type: 'success',
+        message: 'Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.'
+      });
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setStatus({
+        type: 'error',
+        message: error.response?.data?.message || error.message || "Impossible d'envoyer le message. Veuillez réessayer."
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -46,28 +85,28 @@ const Contact = () => {
                 <div className="info-icon"><MapPin size={20} /></div>
                 <div>
                   <h4>Adresse</h4>
-                  <p>Axe N3, Pouma, Cameroun</p>
+                  <p>{settings.address}</p>
                 </div>
               </li>
               <li>
                 <div className="info-icon"><Phone size={20} /></div>
                 <div>
                   <h4>Téléphone</h4>
-                  <p>+237 6 98 94 30 52</p>
+                  <p>{settings.phone}</p>
                 </div>
               </li>
               <li>
                 <div className="info-icon"><Mail size={20} /></div>
                 <div>
                   <h4>Email</h4>
-                  <p>alainbakaba7@gmail.com</p>
+                  <p>{settings.contactEmail}</p>
                 </div>
               </li>
               <li>
                 <div className="info-icon"><Clock size={20} /></div>
                 <div>
                   <h4>Horaires</h4>
-                  <p>Lun - Ven: 9h00 - 18h00<br />Sam: 10h00 - 16h00</p>
+                  <p>{settings.workingHours || 'Lun - Ven: 9h00 - 18h00 | Sam: 10h00 - 16h00'}</p>
                 </div>
               </li>
             </ul>
@@ -75,6 +114,24 @@ const Contact = () => {
 
           <div className="contact-form-container">
             <h2>Envoyez-nous un message</h2>
+            
+            {status.message && (
+              <div 
+                className={`status-message ${status.type}`}
+                style={{
+                  padding: '1rem',
+                  marginBottom: '1rem',
+                  borderRadius: '0.5rem',
+                  backgroundColor: status.type === 'success' ? '#dcfce7' : '#fee2e2',
+                  color: status.type === 'success' ? '#166534' : '#991b1b',
+                  fontSize: '0.9rem',
+                  border: `1px solid ${status.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+                }}
+              >
+                {status.message}
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="contact-form">
               <div className="form-group">
                 <label htmlFor="name">Nom complet</label>
@@ -85,6 +142,7 @@ const Contact = () => {
                   value={formData.name} 
                   onChange={handleChange} 
                   required 
+                  disabled={loading}
                 />
               </div>
               <div className="form-group">
@@ -96,6 +154,7 @@ const Contact = () => {
                   value={formData.email} 
                   onChange={handleChange} 
                   required 
+                  disabled={loading}
                 />
               </div>
               <div className="form-group">
@@ -105,12 +164,13 @@ const Contact = () => {
                   name="subject" 
                   value={formData.subject} 
                   onChange={handleChange}
+                  disabled={loading}
                 >
                   <option value="">Sélectionnez un sujet</option>
-                  <option value="devis">Demande de devis</option>
-                  <option value="info">Renseignements produits</option>
-                  <option value="partenariat">Partenariat</option>
-                  <option value="autre">Autre</option>
+                  <option value="Demande de devis">Demande de devis</option>
+                  <option value="Renseignements produits">Renseignements produits</option>
+                  <option value="Partenariat">Partenariat</option>
+                  <option value="Autre">Autre</option>
                 </select>
               </div>
               <div className="form-group">
@@ -122,12 +182,20 @@ const Contact = () => {
                   value={formData.message} 
                   onChange={handleChange} 
                   required 
+                  disabled={loading}
                 ></textarea>
               </div>
-              <Button type="submit">Envoyer le message</Button>
+              <Button type="submit" disabled={loading}>
+                {loading ? 'Envoi en cours...' : 'Envoyer le message'}
+              </Button>
             </form>
           </div>
         </div>
+      </Section>
+
+      {/* Testimonial Form Section */}
+      <Section bgColor="#f9fafb">
+        <TestimonialForm />
       </Section>
     </div>
   );

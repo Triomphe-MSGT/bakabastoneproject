@@ -44,6 +44,9 @@ router.post('/', async (req, res) => {
     imageUrl: req.body.imageUrl,
     order: req.body.order || 0,
     isActive: req.body.isActive !== undefined ? req.body.isActive : true,
+    likes: req.body.likes || 0,
+    isAvailable: req.body.isAvailable !== undefined ? req.body.isAvailable : true,
+    pricePerM2: req.body.pricePerM2 || 0,
   });
 
   try {
@@ -67,6 +70,9 @@ router.put('/:id', async (req, res) => {
     collection.imageUrl = req.body.imageUrl || collection.imageUrl;
     collection.order = req.body.order !== undefined ? req.body.order : collection.order;
     collection.isActive = req.body.isActive !== undefined ? req.body.isActive : collection.isActive;
+    collection.likes = req.body.likes !== undefined ? req.body.likes : collection.likes;
+    collection.isAvailable = req.body.isAvailable !== undefined ? req.body.isAvailable : collection.isAvailable;
+    collection.pricePerM2 = req.body.pricePerM2 !== undefined ? req.body.pricePerM2 : collection.pricePerM2;
 
     const updatedCollection = await collection.save();
     res.json(updatedCollection);
@@ -85,6 +91,20 @@ router.delete('/:id', async (req, res) => {
     res.json({ message: 'Collection supprimée' });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// PATCH like collection
+router.patch('/:id/like', async (req, res) => {
+  try {
+    const collection = await Collection.findById(req.params.id);
+    if (!collection) return res.status(404).json({ message: 'Collection non trouvée' });
+
+    collection.likes += 1;
+    await collection.save();
+    res.json({ likes: collection.likes });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 });
 

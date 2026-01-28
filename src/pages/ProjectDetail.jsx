@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Layers, Calendar, Tag } from 'lucide-react';
+import { ArrowLeft, Layers, Calendar, Tag, Maximize2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './ProjectDetail.css';
+import projectService from '../services/projectService';
 
 const ProjectDetail = () => {
   const { id } = useParams();
@@ -18,8 +19,7 @@ const ProjectDetail = () => {
 
   const fetchProject = async () => {
     try {
-      const response = await fetch(`${API_URL}/${id}`);
-      const data = await response.json();
+      const data = await projectService.getProjectById(id);
       setProject(data);
     } catch (error) {
       console.error('Erreur:', error);
@@ -95,6 +95,18 @@ const ProjectDetail = () => {
                 <Calendar size={18} />
                 <span>Réalisé le {new Date(project.createdAt).toLocaleDateString()}</span>
               </div>
+              {project.dimensions && (
+                <div className="meta-item">
+                  <Maximize2 size={18} />
+                  <span>{project.dimensions}</span>
+                </div>
+              )}
+              {project.totalPrice > 0 && (
+                <div className="meta-item">
+                  <Tag size={18} />
+                  <span>Coût total: {project.totalPrice.toLocaleString()} FCFA</span>
+                </div>
+              )}
             </div>
 
             <div className="project-description-section">

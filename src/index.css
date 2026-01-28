@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   /* Colors */
   --color-primary: #1c1c1e; /* Dark Charcoal */
@@ -9,6 +13,22 @@
   --color-surface: #ffffff;
   --color-text: #2d2d2d;
   --color-text-light: #6e6e6e;
+  
+  /* Fluid Typography - Responsive font sizes using clamp() */
+  --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);      /* 12px - 14px */
+  --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);        /* 14px - 16px */
+  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);      /* 16px - 18px */
+  --font-size-lg: clamp(1.125rem, 1rem + 0.625vw, 1.25rem);       /* 18px - 20px */
+  --font-size-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);        /* 20px - 24px */
+  --font-size-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);             /* 24px - 32px */
+  --font-size-3xl: clamp(1.875rem, 1.5rem + 1.875vw, 2.5rem);     /* 30px - 40px */
+  --font-size-4xl: clamp(2.25rem, 1.8rem + 2.25vw, 3rem);         /* 36px - 48px */
+  --font-size-5xl: clamp(3rem, 2.5rem + 2.5vw, 4rem);             /* 48px - 64px */
+  
+  /* Line Heights for readability */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
   
   /* Spacing */
   --spacing-xs: 0.5rem;
@@ -27,25 +47,85 @@
   --transition-slow: 0.8s ease;
 }
 
+/* Dark Mode Variables */
+:root.dark-mode {
+  --color-primary: #f0f0f0;
+  --color-secondary: #a0a0a0;
+  --color-background: #0f172a; /* slate-900 */
+  --color-surface: #1e293b; /* slate-800 */
+  --color-text: #e2e8f0; /* slate-200 */
+  --color-text-light: #94a3b8; /* slate-400 */
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+html.dark,
+html.dark-mode {
+  background-color: #0f172a; /* slate-900 */
+}
+
 body {
   font-family: var(--font-body);
-  background-color: var(--color-background);
+  background-color: transparent;
   color: var(--color-text);
-  line-height: 1.6;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   color: var(--color-primary);
-  line-height: 1.2;
+  line-height: var(--line-height-tight);
+  font-weight: 700;
+}
+
+h1 {
+  font-size: var(--font-size-5xl);
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: var(--font-size-4xl);
+  margin-bottom: 0.875rem;
+}
+
+h3 {
+  font-size: var(--font-size-3xl);
+  margin-bottom: 0.75rem;
+}
+
+h4 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: 0.625rem;
+}
+
+h5 {
+  font-size: var(--font-size-xl);
+  margin-bottom: 0.5rem;
+}
+
+h6 {
+  font-size: var(--font-size-lg);
+  margin-bottom: 0.5rem;
+}
+
+p {
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: 1rem;
 }
 
 a {
@@ -76,15 +156,17 @@ img {
 
 .btn {
   display: inline-block;
-  padding: 1rem 2rem;
+  padding: clamp(0.75rem, 0.7rem + 0.25vw, 1rem) clamp(1.5rem, 1.4rem + 0.5vw, 2rem);
   border: none;
   cursor: pointer;
   font-family: var(--font-body);
   font-weight: 500;
+  font-size: var(--font-size-sm);
   letter-spacing: 0.05em;
   transition: all var(--transition-fast);
   text-transform: uppercase;
-  font-size: 0.9rem;
+  border-radius: 0.25rem;
+  line-height: 1.5;
 }
 
 .btn-primary {

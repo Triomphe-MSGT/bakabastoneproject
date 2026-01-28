@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Plus, Edit, Trash2, X, Image as ImageIcon, Save, Loader2, Upload, Link, GripVertical, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import collectionService from '../../services/collectionService';
+import uploadService from '../../services/uploadService';
 
 const CollectionsManager = () => {
   const [collections, setCollections] = useState([]);
@@ -22,12 +24,10 @@ const CollectionsManager = () => {
     features: '',
     imageUrl: '',
     order: 0,
-    isActive: true
+    isActive: true,
+    pricePerM2: 0,
+    isAvailable: true
   });
-
-  const API_URL = 'http://localhost:5000/api/collections';
-  const UPLOAD_URL = 'http://localhost:5000/api/upload';
-  const BASE_URL = 'http://localhost:5000';
 
   useEffect(() => {
     fetchCollections();
@@ -35,13 +35,14 @@ const CollectionsManager = () => {
 
   const fetchCollections = async () => {
     try {
-      const response = await fetch(API_URL);
-      const data = await response.json();
+      const data = await collectionService.getAllCollections();
       setCollections(data);
     } catch (error) {
       console.error('Erreur lors du chargement des collections:', error);
     }
   };
+
+  const BASE_URL = 'http://localhost:5000'; // Kept for image display if needed, or move to config
 
   const uploadImage = async (file) => {
     const formDataUpload = new FormData();
@@ -49,21 +50,14 @@ const CollectionsManager = () => {
 
     setUploading(true);
     try {
-      const response = await fetch(UPLOAD_URL, {
-        method: 'POST',
-        body: formDataUpload,
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-
-      const data = await response.json();
+      const data = await uploadService.uploadFile(formDataUpload);
+      // Ensure we handle the path correctly. Ideally backend returns relative path or full URL.
+      // Assuming backend returns { imageUrl: '/uploads/...' }
+      // If service returns strict data structure, check it.
       return BASE_URL + data.imageUrl;
     } catch (error) {
       console.error('Erreur upload:', error);
-      alert('Erreur lors du téléversement: ' + error.message);
+      alert('Erreur lors du téléversement');
       return null;
     } finally {
       setUploading(false);
@@ -92,21 +86,14 @@ const CollectionsManager = () => {
         features: formData.features.split('\n').filter(f => f.trim() !== '')
       };
 
-      const method = isEditing ? 'PUT' : 'POST';
-      const url = isEditing ? `${API_URL}/${currentCollection._id}` : API_URL;
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(collectionData),
-      });
-
-      if (response.ok) {
-        fetchCollections();
-        resetForm();
+      if (isEditing) {
+        await collectionService.updateCollection(currentCollection._id, collectionData);
+      } else {
+        await collectionService.createCollection(collectionData);
       }
+
+      fetchCollections();
+      resetForm();
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
     } finally {
@@ -117,9 +104,7 @@ const CollectionsManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer cette collection ?')) {
       try {
-        await fetch(`${API_URL}/${id}`, {
-          method: 'DELETE',
-        });
+        await collectionService.deleteCollection(id);
         fetchCollections();
       } catch (error) {
         console.error('Erreur lors de la suppression:', error);
@@ -135,7 +120,9 @@ const CollectionsManager = () => {
       features: (collection.features || []).join('\n'),
       imageUrl: collection.imageUrl,
       order: collection.order,
-      isActive: collection.isActive
+      isActive: collection.isActive,
+      pricePerM2: collection.pricePerM2 || 0,
+      isAvailable: collection.isAvailable !== undefined ? collection.isAvailable : true
     });
     setPreviewUrl(collection.imageUrl);
     setUploadMode('url');
@@ -146,13 +133,7 @@ const CollectionsManager = () => {
 
   const toggleActive = async (collection) => {
     try {
-      await fetch(`${API_URL}/${collection._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ...collection, isActive: !collection.isActive }),
-      });
+      await collectionService.updateCollection(collection._id, { ...collection, isActive: !collection.isActive });
       fetchCollections();
     } catch (error) {
       console.error('Erreur:', error);
@@ -263,6 +244,31 @@ const CollectionsManager = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                   <div className="form-group">
+                    <label className="form-label">Prix au m² (€)</label>
+                    <input
+                      type="number"
+                      value={formData.pricePerM2}
+                      onChange={(e) => setFormData({ ...formData, pricePerM2: parseFloat(e.target.value) || 0 })}
+                      className="form-input"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Disponibilité</label>
+                    <select
+                      value={formData.isAvailable ? 'available' : 'out'}
+                      onChange={(e) => setFormData({ ...formData, isAvailable: e.target.value === 'available' })}
+                      className="form-input form-select"
+                    >
+                      <option value="available">En stock</option>
+                      <option value="out">Sur commande</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="form-group">
                     <label className="form-label">Ordre d'affichage</label>
                     <input
                       type="number"
@@ -273,14 +279,14 @@ const CollectionsManager = () => {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Statut</label>
+                    <label className="form-label">Statut Visibilité</label>
                     <select
                       value={formData.isActive ? 'active' : 'inactive'}
                       onChange={(e) => setFormData({ ...formData, isActive: e.target.value === 'active' })}
                       className="form-input form-select"
                     >
-                      <option value="active">Actif</option>
-                      <option value="inactive">Inactif</option>
+                      <option value="active">Actif (Visible)</option>
+                      <option value="inactive">Inactif (Masqué)</option>
                     </select>
                   </div>
                 </div>

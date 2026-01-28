@@ -32,6 +32,9 @@ router.post('/', async (req, res) => {
     imageUrl: req.body.imageUrl,
     category: req.body.category,
     materials: req.body.materials || [],
+    totalPrice: req.body.totalPrice || 0,
+    dimensions: req.body.dimensions || '',
+    likes: req.body.likes || 0,
   });
 
   try {
@@ -53,6 +56,9 @@ router.put('/:id', async (req, res) => {
     project.imageUrl = req.body.imageUrl || project.imageUrl;
     project.category = req.body.category || project.category;
     project.materials = req.body.materials !== undefined ? req.body.materials : project.materials;
+    project.totalPrice = req.body.totalPrice !== undefined ? req.body.totalPrice : project.totalPrice;
+    project.dimensions = req.body.dimensions !== undefined ? req.body.dimensions : project.dimensions;
+    project.likes = req.body.likes !== undefined ? req.body.likes : project.likes;
 
     const updatedProject = await project.save();
     res.json(updatedProject);
@@ -71,6 +77,20 @@ router.delete('/:id', async (req, res) => {
     res.json({ message: 'Projet supprimé' });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+});
+
+// PATCH like project
+router.patch('/:id/like', async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+    if (!project) return res.status(404).json({ message: 'Projet non trouvé' });
+
+    project.likes += 1;
+    await project.save();
+    res.json({ likes: project.likes });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 });
 

@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone } from 'lucide-react';
+import { Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Send, Music } from 'lucide-react';
 import './Footer.css';
+import settingsService from '../../services/settingsService';
 
 const Footer = () => {
+  const [settings, setSettings] = useState({
+    contactEmail: 'contact@sitevitrine.fr',
+    phone: '+33 1 23 45 67 89',
+    address: '123 Rue de la Pierre, 75001 Paris',
+    siteDescription: '',
+    facebookUrl: '',
+    instagramUrl: '',
+    tiktokUrl: '',
+    telegramUrl: '',
+  });
+
+
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const data = await settingsService.getSettings();
+        setSettings(prev => ({ ...prev, ...data }));
+      } catch (error) {
+        console.error('Error fetching settings for footer:', error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   return (
     <footer className="footer">
       <div className="container">
@@ -14,8 +40,7 @@ const Footer = () => {
               <img src="/logo.png" alt="Stone Bakaba Decoration" style={{ height: '80px', width: 'auto', objectFit: 'contain', marginBottom: '1rem' }} />
             </Link>
             <p className="footer-desc">
-              Expertise et passion de la pierre naturelle. 
-              Vente, pose, décoration et rénovation pour tous vos projets d'aménagement.
+              {settings.siteDescription || `Expertise et passion de la pierre naturelle. Vente, pose, décoration et rénovation pour tous vos projets d'aménagement.`}
             </p>
           </div>
 
@@ -36,15 +61,15 @@ const Footer = () => {
             <ul className="footer-contact">
               <li>
                 <MapPin size={18} />
-                <span>Axe N3, Pouma, Cameroun</span>
+                <span>{settings.address}</span>
               </li>
               <li>
                 <Phone size={18} />
-                <span>+237 6 98 94 30 52</span>
+                <span>{settings.phone}</span>
               </li>
               <li>
                 <Mail size={18} />
-                <span>alainbakaba7@gmail.com</span>
+                <span>{settings.contactEmail}</span>
               </li>
             </ul>
           </div>
@@ -53,9 +78,26 @@ const Footer = () => {
           <div className="footer-col">
             <h4 className="footer-heading">Suivez-nous</h4>
             <div className="footer-social">
-              <a href="https://www.facebook.com/share/1E6ad1N8mt/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><Facebook size={24} /></a>
-              {/* <a href="#" aria-label="Instagram"><Instagram size={24} /></a>
-              <a href="#" aria-label="LinkedIn"><Linkedin size={24} /></a> */}
+              {settings.facebookUrl && (
+                <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                  <Facebook size={24} />
+                </a>
+              )}
+              {settings.instagramUrl && (
+                <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <Instagram size={24} />
+                </a>
+              )}
+              {settings.tiktokUrl && (
+                <a href={settings.tiktokUrl} target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                  <Music size={24} />
+                </a>
+              )}
+              {settings.telegramUrl && (
+                <a href={settings.telegramUrl} target="_blank" rel="noopener noreferrer" aria-label="Telegram">
+                  <Send size={24} />
+                </a>
+              )}
             </div>
           </div>
         </div>

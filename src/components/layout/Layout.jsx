@@ -1,6 +1,8 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import WhatsAppButton from '../ui/WhatsAppButton';
+import FloatingTestimonials from '../ui/FloatingTestimonials';
 import { Outlet } from 'react-router-dom';
 import './Layout.css';
 
@@ -12,6 +14,8 @@ const Layout = () => {
         <Outlet />
       </main>
       <Footer />
+      <WhatsAppButton />
+      <FloatingTestimonials />
     </div>
   );
 };

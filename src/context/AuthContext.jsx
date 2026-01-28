@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+import authService from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 
 const AuthContext = createContext();
@@ -16,26 +17,21 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+
+
   const login = async (username, password) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
+      const data = await authService.login({ username, password });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('userInfo', JSON.stringify(data));
-        setUser(data);
-        navigate('/admin');
-        return { success: true };
-      } else {
-        return { success: false, message: data.message };
-      }
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      setUser(data);
+      navigate('/admin');
+      return { success: true };
     } catch (error) {
-      return { success: false, message: 'Erreur de connexion' };
+      if (error.response && error.response.status === 401) {
+        return { success: false, message: error.response.data.message || 'Identifiants invalides' };
+      }
+      return { success: false, message: error.message || 'Erreur de connexion' };
     }
   };
 
