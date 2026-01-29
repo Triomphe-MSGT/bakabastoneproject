@@ -45,10 +45,10 @@
 
 .testimonial-label {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700; /* Slightly bolder for better contrast */
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-primary); /* Uses your existing CSS var */
+  color: #000000 !important;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -66,13 +66,14 @@
 .testimonial-quote {
   font-size: 0.9rem;
   line-height: 1.5;
-  color: #374151;
+  color: #000000 !important;
   font-style: italic;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-weight: 500;
 }
 
 .testimonial-author {
@@ -110,12 +111,12 @@
 .author-name {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #111827;
+  color: #000000 !important;
 }
 
 .author-role {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: #333333 !important;
 }
 
 .testimonial-stars {

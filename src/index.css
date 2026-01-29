@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -53,7 +53,7 @@
   --color-secondary: #a0a0a0;
   --color-background: #0f172a; /* slate-900 */
   --color-surface: #1e293b; /* slate-800 */
-  --color-text: #e2e8f0; /* slate-200 */
+  --color-text: #f2f5f8; /* slate-200 */
   --color-text-light: #94a3b8; /* slate-400 */
 }
 

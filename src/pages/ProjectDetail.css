@@ -81,8 +81,13 @@
   padding: 2.5rem;
   border-radius: 1rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  position: sticky;
-  top: 6rem;
+}
+
+@media (min-width: 1024px) {
+  .project-content-container {
+    position: sticky;
+    top: 6rem;
+  }
 }
 
 .project-category-badge {
@@ -149,9 +154,9 @@
   padding: 0.5rem 1rem;
   background-color: #f3f4f6;
   border-radius: 0.5rem;
-  color: var(--color-primary);
+  color: #000000 !important;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600; /* Increased weight for better contrast in black */
 }
 
 .material-tag svg {
@@ -161,14 +166,26 @@
 /* Responsive */
 @media (max-width: 768px) {
   .project-detail-page {
-    padding-top: 6rem;
+    padding-top: 5rem; /* Reduced padding for mobile */
   }
   
+  .project-detail-container {
+    padding: 0 1rem; /* More space for content on small screens */
+  }
+
   .project-detail-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    margin-top: 0.5rem;
   }
   
   .project-content-container {
     padding: 1.5rem;
+    margin-top: -1rem; /* Overlap slightly with image or just bring closer */
+  }
+
+  .project-meta {
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
 }
