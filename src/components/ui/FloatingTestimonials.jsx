@@ -60,8 +60,21 @@ const FloatingTestimonials = () => {
       .toUpperCase();
   };
 
+  const handleCardClick = () => {
+    // If we are on home page, scroll to section
+    if (window.location.pathname === '/') {
+      const element = document.getElementById('testimonials');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      // If on other page, go to home page with hash
+      window.location.href = '/#testimonials';
+    }
+  };
+
   return (
-    <div className="floating-testimonials-container">
+    <div className="floating-testimonials-container" onClick={handleCardClick} style={{ cursor: 'pointer' }}>
       {loading ? (
         <div className="testimonial-card-wrapper">
           <div className="loading-dots">
@@ -78,7 +91,10 @@ const FloatingTestimonials = () => {
               Avis Clients
             </div>
             <button 
-              onClick={() => setIsVisible(false)}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent card click
+                setIsVisible(false);
+              }}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', padding: 0 }}
               aria-label="Fermer"
             >
