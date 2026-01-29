@@ -27,12 +27,14 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Login from './pages/Login';
+import ScrollToAnchor from './components/ui/ScrollToAnchor';
 
 function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
         <LanguageProvider>
+          <ScrollToAnchor />
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />

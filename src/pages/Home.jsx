@@ -33,6 +33,7 @@ const Home = () => {
     return () => clearInterval(interval);
   }, [currentImageIndex]);
 
+  /* 
   useEffect(() => {
     if (testimonials.length > 0) {
       const interval = setInterval(() => {
@@ -41,6 +42,7 @@ const Home = () => {
       return () => clearInterval(interval);
     }
   }, [testimonials]);
+  */
 
   const nextImage = () => {
     setDirection(1);

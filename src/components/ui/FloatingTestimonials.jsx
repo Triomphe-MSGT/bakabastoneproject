@@ -26,6 +26,7 @@ const FloatingTestimonials = () => {
     fetchTestimonials();
   }, []);
 
+  /*
   useEffect(() => {
     if (testimonials.length <= 1) return;
 
@@ -35,6 +36,7 @@ const FloatingTestimonials = () => {
 
     return () => clearInterval(interval);
   }, [testimonials]);
+  */
 
   if (!isVisible || (testimonials.length === 0 && !loading)) return null;
 
