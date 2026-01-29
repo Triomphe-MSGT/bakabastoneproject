@@ -226,7 +226,8 @@ const ExpertiseManager = () => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                height: '150px'
+                height: '150px',
+                position: 'relative'
               }}>
                 <div style={{
                   fontSize: '3rem',
@@ -252,7 +253,7 @@ const ExpertiseManager = () => {
                   {item.isActive ? 'Actif' : 'Inactif'}
                 </div>
                 
-                <div className="project-card-actions">
+                <div className="project-card-actions" style={{ opacity: 1, transform: 'translateY(0)' }}>
                   <button
                     onClick={() => toggleActive(item)}
                     className="action-btn"

@@ -20,8 +20,14 @@ const updatePassword = async (passwordData) => {
   return response.data;
 };
 
+const logout = async () => {
+  const response = await api.post('/auth/logout');
+  return response.data;
+};
+
 const authService = {
   login,
+  logout,
   getProfile,
   updateProfile,
   updatePassword

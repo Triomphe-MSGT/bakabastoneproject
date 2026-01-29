@@ -35,7 +35,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
     localStorage.removeItem('userInfo');
     setUser(null);
     navigate('/login');
