@@ -42,7 +42,7 @@ const CollectionsManager = () => {
     }
   };
 
-  const BASE_URL = 'http://localhost:5000'; // Kept for image display if needed, or move to config
+  const BASE_URL = ''; // Kept for image display if needed, or move to config
 
   const uploadImage = async (file) => {
     const formDataUpload = new FormData();

@@ -10,7 +10,7 @@ const Portfolio = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = 'http://localhost:5000/api/projects';
+  const API_URL = '/api/projects';
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -100,7 +100,7 @@ const Portfolio = () => {
                         <motion.img 
                           whileHover={{ scale: 1.1 }}
                           transition={{ duration: 0.7 }}
-                          src={project.imageUrl ? (project.imageUrl.startsWith('http') ? project.imageUrl : `http://localhost:5000${project.imageUrl}`) : ''} 
+                          src={project.imageUrl ? (project.imageUrl.startsWith('http') ? project.imageUrl : `${project.imageUrl}`) : ''} 
                           alt={project.title}
                           className="w-full h-full object-cover"
                         />

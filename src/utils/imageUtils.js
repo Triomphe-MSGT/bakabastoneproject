@@ -4,6 +4,6 @@ export const getImageSrc = (imageUrl) => {
     return imageUrl;
   }
   // Fallback to local server if it's a relative path
-  const BASE_URL = 'http://localhost:5000';
+  const BASE_URL = '';
   return BASE_URL + imageUrl;
 };

@@ -38,7 +38,7 @@ const TeamManager = () => {
     }
   };
 
-  const BASE_URL = 'http://localhost:5000';
+  const BASE_URL = '';
 
   const uploadImage = async (file) => {
     const formDataUpload = new FormData();

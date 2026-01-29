@@ -10,8 +10,8 @@ const ProjectDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = 'http://localhost:5000/api/projects';
-  const BASE_URL = 'http://localhost:5000';
+  const API_URL = '/api/projects';
+  const BASE_URL = '';
 
   useEffect(() => {
     fetchProject();

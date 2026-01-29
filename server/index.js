@@ -63,7 +63,17 @@ app.get('/', (req, res) => {
   res.send('API Site Vitrine en ligne');
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
-});
+// Start Server - Only if not running as a Vercel function
+if (process.env.NODE_ENV !== 'production' || process.env.VERCEL) {
+    // Note: Vercel normally doesn't need this, but for local testing or other environments it might.
+    // However, Vercel will ignore app.listen() if we export the app.
+}
+
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Serveur démarré sur le port ${PORT}`);
+  });
+}
+
+export default app;

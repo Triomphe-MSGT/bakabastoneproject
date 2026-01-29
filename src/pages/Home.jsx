@@ -289,7 +289,7 @@ const Home = () => {
                       <motion.img
                         whileHover={{ scale: 1.1 }}
                         transition={{ duration: 0.6 }}
-                        src={project.imageUrl ? (project.imageUrl.startsWith('http') ? project.imageUrl : `http://localhost:5000${project.imageUrl}`) : '/images/stone-1.png'}
+                        src={project.imageUrl ? (project.imageUrl.startsWith('http') ? project.imageUrl : `${project.imageUrl}`) : '/images/stone-1.png'}
                         alt={project.title}
                         className="w-full h-full object-cover"
                       />
@@ -481,7 +481,7 @@ const Home = () => {
                     <motion.img 
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.6 }}
-                      src={member.imageUrl ? (member.imageUrl.startsWith('http') ? member.imageUrl : `http://localhost:5000${member.imageUrl}`) : 'https://via.placeholder.com/300?text=Membre'} 
+                      src={member.imageUrl ? (member.imageUrl.startsWith('http') ? member.imageUrl : `${member.imageUrl}`) : 'https://via.placeholder.com/300?text=Membre'} 
                       alt={member.name}
                       className="w-full h-full object-cover"
                     />

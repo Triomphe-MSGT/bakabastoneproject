@@ -10,8 +10,8 @@ const Products = () => {
   const [collections, setCollections] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const API_URL = 'http://localhost:5000/api/collections';
-  const BASE_URL = 'http://localhost:5000';
+  const API_URL = '/api/collections';
+  const BASE_URL = '';
 
   useEffect(() => {
     fetchCollections();
