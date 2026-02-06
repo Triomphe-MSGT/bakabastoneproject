@@ -92,11 +92,20 @@ const Home = () => {
 
   const fetchProjects = async () => {
     try {
-      const data = await projectService.getAllProjects();
-      // Take first 3 projects for the home page or specific 'featured' if available
-      setRecentProjects(data.slice(0, 3));
+      // Fetch the 3 most recent projects using the paginated API
+      const response = await fetch('/api/projects?page=1&limit=3');
+      const data = await response.json();
+      
+      // Handle both paginated and non-paginated responses
+      if (data.projects) {
+        setRecentProjects(data.projects);
+      } else {
+        // Fallback for non-paginated response (take first 3)
+        setRecentProjects(data.slice(0, 3));
+      }
     } catch (error) {
       console.error('Error fetching projects:', error);
+      setRecentProjects([]);
     }
   };
 
@@ -112,11 +121,9 @@ const Home = () => {
 
   const fetchTestimonials = async () => {
     try {
-      // Fetch only approved testimonials
-      const data = await testimonialService.getAllTestimonials();
-      // Filter for approved testimonials only
-      const approvedTestimonials = data.filter(t => t.isApproved === true);
-      setTestimonials(approvedTestimonials || []);
+      // Fetch only featured and approved testimonials (public route)
+      const data = await testimonialService.getFeaturedTestimonials();
+      setTestimonials(data || []);
     } catch (error) {
       console.error('Erreur lors du chargement des témoignages:', error);
       setTestimonials([]);

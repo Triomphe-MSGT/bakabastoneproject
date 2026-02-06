@@ -36,9 +36,15 @@ const CollectionsManager = () => {
   const fetchCollections = async () => {
     try {
       const data = await collectionService.getAllCollections();
-      setCollections(data);
+      // Handle both paginated and non-paginated responses
+      if (data.collections) {
+        setCollections(data.collections);
+      } else {
+        setCollections(data);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des collections:', error);
+      setCollections([]);
     }
   };
 

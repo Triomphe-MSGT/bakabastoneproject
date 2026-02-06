@@ -34,9 +34,15 @@ const ProjectManager = () => {
   const fetchProjects = async () => {
     try {
       const data = await projectService.getAllProjects();
-      setProjects(data);
+      // Handle both paginated and non-paginated responses
+      if (data.projects) {
+        setProjects(data.projects);
+      } else {
+        setProjects(data);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des projets:', error);
+      setProjects([]);
     }
   };
 

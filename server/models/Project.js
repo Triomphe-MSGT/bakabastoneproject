@@ -28,10 +28,6 @@ const projectSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
-  likes: {
-    type: Number,
-    default: 0,
-  },
   createdAt: {
     type: Date,
     default: Date.now,

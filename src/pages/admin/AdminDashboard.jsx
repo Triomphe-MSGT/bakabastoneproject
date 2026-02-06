@@ -35,7 +35,17 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    if (user?.token) {
+      fetchData();
+      
+      // Refresh dashboard data every 30 seconds
+      const intervalId = setInterval(fetchData, 30000);
+      
+      return () => clearInterval(intervalId);
+    }
+  }, [user]);
+
+  const fetchData = async () => {
       try {
         const [projectsData, messagesData, collectionsData, expertiseData] = await Promise.all([
           projectService.getAllProjects(),
@@ -44,11 +54,28 @@ const AdminDashboard = () => {
           expertiseService.getAllExpertise(),
         ]);
 
-        // Calculate stats
-        const projectCount = Array.isArray(projectsData) ? projectsData.length : 0;
+        // Calculate stats dealing with paginated or array responses
+        let projectCount = 0;
+        if (projectsData.totalProjects !== undefined) {
+             projectCount = projectsData.totalProjects;
+        } else if (projectsData.projects && Array.isArray(projectsData.projects)) {
+             projectCount = projectsData.projects.length;
+        } else if (Array.isArray(projectsData)) {
+             projectCount = projectsData.length;
+        }
+
         const messageCount = Array.isArray(messagesData) ? messagesData.length : 0;
         const unreadCount = Array.isArray(messagesData) ? messagesData.filter(m => !m.read).length : 0;
-        const collectionCount = Array.isArray(collectionsData) ? collectionsData.length : 0;
+        
+        let collectionCount = 0;
+        if (collectionsData.totalCollections !== undefined) {
+            collectionCount = collectionsData.totalCollections;
+        } else if (collectionsData.collections && Array.isArray(collectionsData.collections)) {
+            collectionCount = collectionsData.collections.length;
+        } else if (Array.isArray(collectionsData)) {
+            collectionCount = collectionsData.length;
+        }
+
         const expertiseCount = Array.isArray(expertiseData) ? expertiseData.length : 0;
 
         setStats({
@@ -72,11 +99,6 @@ const AdminDashboard = () => {
         setLoading(false);
       }
     };
-
-    if (user?.token) {
-      fetchData();
-    }
-  }, [user]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";

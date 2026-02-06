@@ -1,5 +1,6 @@
 import express from 'express';
 import Expertise from '../models/Expertise.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.get('/active', async (req, res) => {
 });
 
 // POST create expertise
-router.post('/', async (req, res) => {
+router.post('/', protect, async (req, res) => {
   const expertise = new Expertise({
     title: req.body.title,
     description: req.body.description,
@@ -42,7 +43,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update expertise
-router.put('/:id', async (req, res) => {
+router.put('/:id', protect, async (req, res) => {
   try {
     const expertise = await Expertise.findById(req.params.id);
     if (!expertise) return res.status(404).json({ message: 'Expertise non trouvée' });
@@ -61,7 +62,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE expertise
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', protect, async (req, res) => {
   try {
     const expertise = await Expertise.findById(req.params.id);
     if (!expertise) return res.status(404).json({ message: 'Expertise non trouvée' });

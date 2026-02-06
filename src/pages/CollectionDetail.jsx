@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Check, Star, Award, Shield, Heart, Tag, XCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Check, Star, Award, Shield, Tag, XCircle, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './CollectionDetail.css';
 import collectionService from '../services/collectionService';
@@ -16,18 +16,6 @@ const CollectionDetail = () => {
   useEffect(() => {
     fetchCollection();
   }, [id]);
-
-  const handleLike = async () => {
-    try {
-      const response = await fetch(`${API_URL}/${id}/like`, { method: 'PATCH' });
-      if (response.ok) {
-        const data = await response.json();
-        setCollection(prev => ({ ...prev, likes: data.likes }));
-      }
-    } catch (error) {
-       console.error('Error liking:', error);
-    }
-  };
 
   const fetchCollection = async () => {
     try {
@@ -118,24 +106,6 @@ const CollectionDetail = () => {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
               <span className="collection-badge">Collection Premium</span>
-              <button 
-                onClick={handleLike}
-                style={{ 
-                  background: 'rgba(255,255,255,0.2)', 
-                  border: 'none', 
-                  color: 'white', 
-                  padding: '0.4rem 0.8rem', 
-                  borderRadius: '50px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '0.4rem', 
-                  cursor: 'pointer',
-                  backdropFilter: 'blur(5px)'
-                }}
-              >
-                <Heart size={18} fill={collection.likes > 0 ? "white" : "none"} />
-                <span>{collection.likes || 0}</span>
-              </button>
             </div>
             <h1 className="collection-title">{collection.name}</h1>
             <p className="collection-short-desc">{collection.description}</p>

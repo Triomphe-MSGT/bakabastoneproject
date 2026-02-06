@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Maximize2, Tag, Heart, ArrowRight } from 'lucide-react';
+import { Maximize2, Tag, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Section from '../components/ui/Section';
 import './Portfolio.css';
@@ -9,14 +9,31 @@ import projectService from '../services/projectService';
 const Portfolio = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalProjects, setTotalProjects] = useState(0);
 
   const API_URL = '/api/projects';
+  const ITEMS_PER_PAGE = 9;
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const data = await projectService.getAllProjects();
-        setProjects(data);
+        setLoading(true);
+        const response = await fetch(`${API_URL}?page=${currentPage}&limit=${ITEMS_PER_PAGE}`);
+        const data = await response.json();
+        
+        // Handle both paginated and non-paginated responses
+        if (data.projects) {
+          setProjects(data.projects);
+          setTotalPages(data.totalPages || 1);
+          setTotalProjects(data.totalProjects || 0);
+        } else {
+          // Fallback for non-paginated response
+          setProjects(data);
+          setTotalPages(1);
+          setTotalProjects(data.length);
+        }
       } catch (err) {
         console.error('Error fetching projects:', err);
       } finally {
@@ -24,21 +41,7 @@ const Portfolio = () => {
       }
     };
     fetchProjects();
-  }, []);
-
-  const handleLike = async (id, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    try {
-      const response = await fetch(`${API_URL}/${id}/like`, { method: 'PATCH' });
-      if (response.ok) {
-        const data = await response.json();
-        setProjects(prev => prev.map(p => p._id === id ? { ...p, likes: data.likes } : p));
-      }
-    } catch (error) {
-       console.error('Error liking:', error);
-    }
-  };
+  }, [currentPage]);
 
   return (
     <div className="portfolio-page min-h-screen transition-colors duration-300">
@@ -79,91 +82,124 @@ const Portfolio = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-amber-500 border-t-transparent"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 container mx-auto px-4">
-            <AnimatePresence>
-              {projects.map((project, index) => (
-                <motion.div
-                  key={project._id}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="group"
-                >
-                  <Link 
-                    to={`/project/${project._id}`}
-                    className="block group"
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 container mx-auto px-4">
+              <AnimatePresence>
+                {projects.map((project, index) => (
+                  <motion.div
+                    key={project._id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="group"
                   >
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-slate-700 h-full relative">
-                      
-                      {/* Image Container */}
-                      <div className="relative h-80 overflow-hidden">
-                        <motion.img 
-                          whileHover={{ scale: 1.1 }}
-                          transition={{ duration: 0.7 }}
-                          src={project.imageUrl ? (project.imageUrl.startsWith('http') ? project.imageUrl : `${project.imageUrl}`) : ''} 
-                          alt={project.title}
-                          className="w-full h-full object-cover"
-                        />
+                    <Link 
+                      to={`/project/${project._id}`}
+                      className="block group"
+                    >
+                      <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-100 dark:border-slate-700 h-full relative">
                         
-                        {/* Gradient Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
+                        {/* Image Container */}
+                        <div className="relative h-80 overflow-hidden">
+                          <motion.img 
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.7 }}
+                            src={project.imageUrl ? (project.imageUrl.startsWith('http') ? project.imageUrl : `${project.imageUrl}`) : ''} 
+                            alt={project.title}
+                            className="w-full h-full object-cover"
+                          />
+                          
+                          {/* Gradient Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
 
-                        {/* Category Badge */}
-                        <div className="absolute top-4 left-4">
-                          <span className="px-4 py-2 bg-amber-600 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-lg flex items-center gap-2">
-                            <Tag size={12} /> {project.category}
-                          </span>
-                        </div>
-
-                        {/* Like Button */}
-                        <button 
-                          onClick={(e) => handleLike(project._id, e)}
-                          className="absolute top-4 right-4 w-10 h-10 bg-white/20 backdrop-blur-md hover:bg-amber-500 rounded-full flex items-center justify-center text-white transition-all duration-300 group-hover:scale-110 shadow-lg"
-                        >
-                          <Heart size={20} className={project.likes > 0 ? "fill-white" : ""} />
-                          {project.likes > 0 && (
-                            <span className="absolute -bottom-2 -right-1 bg-amber-600 text-white text-[10px] font-bold px-1.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center border border-white/20">
-                              {project.likes}
+                          {/* Category Badge */}
+                          <div className="absolute top-4 left-4">
+                            <span className="px-4 py-2 bg-amber-600 text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-lg flex items-center gap-2">
+                              <Tag size={12} /> {project.category}
                             </span>
-                          )}
-                        </button>
+                          </div>
 
-                        {/* Hover Overlay Icon */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-500 delay-100">
-                            <ArrowRight size={32} className="text-white" />
+                          {/* Hover Overlay Icon */}
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-500 delay-100">
+                              <ArrowRight size={32} className="text-white" />
+                            </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Content Overlay - Always visible at bottom */}
-                      <div className="absolute bottom-0 left-0 w-full p-6 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                        <h3 className="text-2xl font-heading font-bold mb-2 group-hover:text-amber-400 transition-colors">
-                          {project.title}
-                        </h3>
-                        
-                        <div className="flex flex-wrap gap-3 opacity-80 group-hover:opacity-100 transition-opacity delay-100">
-                          {project.dimensions && (
-                            <span className="flex items-center gap-1.5 text-xs font-medium bg-white/10 backdrop-blur-sm px-2 py-1 rounded">
-                              <Maximize2 size={12} /> {project.dimensions}
-                            </span>
-                          )}
-                          {project.totalPrice > 0 && (
-                            <span className="flex items-center gap-1.5 text-xs font-medium bg-white/10 backdrop-blur-sm px-2 py-1 rounded">
-                              {project.totalPrice.toLocaleString()} FCFA
-                            </span>
-                          )}
+                        {/* Content Overlay - Always visible at bottom */}
+                        <div className="absolute bottom-0 left-0 w-full p-6 text-white transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                          <h3 className="text-2xl font-heading font-bold mb-2 group-hover:text-amber-400 transition-colors">
+                            {project.title}
+                          </h3>
+                          
+                          <div className="flex flex-wrap gap-3 opacity-80 group-hover:opacity-100 transition-opacity delay-100">
+                            {project.dimensions && (
+                              <span className="flex items-center gap-1.5 text-xs font-medium bg-white/10 backdrop-blur-sm px-2 py-1 rounded">
+                                <Maximize2 size={12} /> {project.dimensions}
+                              </span>
+                            )}
+                            {project.totalPrice > 0 && (
+                              <span className="flex items-center gap-1.5 text-xs font-medium bg-white/10 backdrop-blur-sm px-2 py-1 rounded">
+                                {project.totalPrice.toLocaleString()} FCFA
+                              </span>
+                            )}
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Decorative Line */}
-                      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-amber-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
-                    </div>
-                  </Link>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
+                        {/* Decorative Line */}
+                        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-amber-700 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex justify-center items-center gap-4 mt-12"
+              >
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-slate-800 disabled:hover:text-gray-900 dark:disabled:hover:text-white flex items-center gap-2"
+                >
+                  <ChevronLeft size={20} />
+                  Précédent
+                </button>
+
+                <div className="flex items-center gap-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-10 h-10 rounded-lg font-semibold transition-all ${
+                        currentPage === page
+                          ? 'bg-amber-500 text-white'
+                          : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 hover:bg-amber-100 dark:hover:bg-slate-700'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white dark:disabled:hover:bg-slate-800 disabled:hover:text-gray-900 dark:disabled:hover:text-white flex items-center gap-2"
+                >
+                  Suivant
+                  <ChevronRight size={20} />
+                </button>
+              </motion.div>
+            )}
+          </>
         )}
       </Section>
     </div>

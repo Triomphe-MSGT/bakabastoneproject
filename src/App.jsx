@@ -47,22 +47,25 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
             
-            <Route path="/login" element={<Login />} />
-
-            {/* Admin Routes */}
-            <Route path="/admin" element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<AdminDashboard />} />
-              <Route path="collections" element={<CollectionsManager />} />
-              <Route path="expertise" element={<ExpertiseManager />} />
-              <Route path="projects" element={<ProjectManager />} />
-              <Route path="team" element={<TeamManager />} />
-              <Route path="testimonials" element={<TestimonialsManager />} />
-              <Route path="messages" element={<MessagesManager />} />
-              <Route path="settings" element={<SettingsPage />} />
+            {/* Login Route Removed */}
+            
+            {/* Administration secrète : Inaccessible sans l'URL et le Basic Auth serveur */}
+            <Route path={import.meta.env.VITE_ADMIN_PATH || "/panel-protection-fallback"}>
+              <Route index element={<Login />} />
+              <Route element={
+                <ProtectedRoute>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }>
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="collections" element={<CollectionsManager />} />
+                <Route path="expertise" element={<ExpertiseManager />} />
+                <Route path="projects" element={<ProjectManager />} />
+                <Route path="team" element={<TeamManager />} />
+                <Route path="testimonials" element={<TestimonialsManager />} />
+                <Route path="messages" element={<MessagesManager />} />
+                <Route path="settings" element={<SettingsPage />} />
+              </Route>
             </Route>
           </Routes>
         </LanguageProvider>

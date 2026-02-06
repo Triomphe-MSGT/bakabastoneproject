@@ -37,6 +37,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 import settingsRoutes from './routes/settingsRoutes.js';
+import basicAuth from './middleware/basicAuth.js';
+
+// Système d'accès secret : Intercepte toute requête vers l'URL secrète
+if (process.env.ADMIN_PATH) {
+  app.use(process.env.ADMIN_PATH, basicAuth);
+}
 
 app.use('/api/projects', projectRoutes);
 app.use('/api/auth', authRoutes);
@@ -53,12 +59,21 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/sitevitri
   .then(async () => {
     console.log('Connecté à MongoDB');
     
-    // Seed Admin User
-    const adminExists = await User.findOne({ username: 'admin' });
-    if (!adminExists) {
-      const admin = new User({ username: 'admin', password: '00000000' });
+    // Seed/Update Admin User from .env to ensure synchronization
+    const adminUsername = process.env.ADMIN_USER || 'admin';
+    const adminPassword = process.env.ADMIN_PASS || '00000000';
+    
+    let admin = await User.findOne({ username: adminUsername });
+    
+    if (!admin) {
+      admin = new User({ username: adminUsername, password: adminPassword });
       await admin.save();
-      console.log('Admin user created: admin / 00000000');
+      console.log(`Admin user created: ${adminUsername} (sync with .env)`);
+    } else {
+      // Optionnel: On peut forcer la mise à jour si on veut que le .env soit la source unique de vérité
+      admin.password = adminPassword;
+      await admin.save();
+      console.log(`Admin user password synchronized with .env`);
     }
   })
   .catch((err) => console.error('Erreur de connexion MongoDB:', err));
